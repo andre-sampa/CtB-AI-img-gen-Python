@@ -28,9 +28,9 @@ jobs:
 
       - name: Download model from Hugging Face Hub
         env:
-          HF_TOKEN: ${{ secrets.HF_TOKEN }}  # Add your Hugging Face token as a secret
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}  # Use the Hugging Face token from GitHub secrets
         run: |
-          python -c "from transformers import AutoModel; AutoModel.from_pretrained('andresampa/CtB-AI-img-gen-Python', use_auth_token=True).save_pretrained('./model')"
+          python -c "from transformers import AutoModel; AutoModel.from_pretrained('andresampa/CtB-AI-img-gen-Python', token='$HF_TOKEN').save_pretrained('./model')"
 
       - name: Commit and push model files
         env:
