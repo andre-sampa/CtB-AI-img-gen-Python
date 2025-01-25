@@ -1,4 +1,4 @@
-name: Sync2 Hugging Face Space to GitHub
+name: Sync Hugging Face Space to GitHub
 
 on:
   workflow_dispatch:  # Allows manual triggering
@@ -28,20 +28,17 @@ jobs:
         run: |
           pip install huggingface_hub
 
-      - name: Download files from Hugging Face Space to a temporary directory
+      - name: Delete all files (except .git)
+        run: |
+          # Remove all files and folders except .git to avoid breaking the repository
+          find . -mindepth 1 -maxdepth 1 ! -name '.git' -exec rm -rf {} +
+
+      - name: Download files from Hugging Face Space to root
         run: |
           python -c "
           from huggingface_hub import snapshot_download
-          snapshot_download(repo_id='andresampa/CtB-AI-img-gen-Python', repo_type='space', local_dir='./temp_space_files')
+          snapshot_download(repo_id='andresampa/CtB-AI-img-gen-Python', repo_type='space', local_dir='.')
           "
-
-      - name: Sync files to root (delete missing files, move new/updated files)
-        run: |
-          # Move new/updated files to the root
-          rsync -av --delete ./temp_space_files/ .
-
-          # Remove the temporary directory
-          rm -rf ./temp_space_files
 
       - name: Commit and push files
         env:
@@ -51,5 +48,5 @@ jobs:
           git config --global user.email "actions@github.com"
           git remote set-url origin https://x-access-token:$PAT@github.com/andre-sampa/CtB-AI-img-gen-Python.git
           git add --all  # Add all changes, including deletions
-          git commit -m "Sync files from Hugging Face Space (including deletions)"
+          git commit -m "Sync files from Hugging Face Space (delete all and re-download)"
           git push origin main
