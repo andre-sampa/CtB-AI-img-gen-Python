@@ -1,4 +1,4 @@
-name: Sync Hugging Face Space to GitHub
+name: Sync2 Hugging Face Space to GitHub
 
 on:
   workflow_dispatch:  # Allows manual triggering
