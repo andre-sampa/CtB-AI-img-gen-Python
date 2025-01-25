@@ -1,9 +1,9 @@
 name: Sync Hugging Face Model to GitHub
 
 on:
-  workflow_dispatch:  # Allows manual triggering of the workflow
+  workflow_dispatch:  # Allows manual triggering
   schedule:
-    - cron: '0 0 * * *'  # Runs daily at midnight (optional, for automatic syncing)
+    - cron: '0 0 * * *'  # Optional: Runs daily at midnight
 
 jobs:
   sync:
@@ -15,17 +15,26 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.9'  # Use a compatible Python version
+          python-version: '3.9'
+
+      - name: Install Git LFS
+        run: |
+          sudo apt-get install git-lfs
+          git lfs install
 
       - name: Install dependencies
         run: |
-          pip install transformers huggingface-hub
+          pip install torch transformers huggingface-hub
 
       - name: Download model from Hugging Face Hub
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}  # Add your Hugging Face token as a secret
         run: |
-          python -c "from transformers import AutoModel; AutoModel.from_pretrained('andresampa/CtB-AI-img-gen-Python').save_pretrained('./model')"
+          python -c "from transformers import AutoModel; AutoModel.from_pretrained('andresampa/CtB-AI-img-gen-Python', use_auth_token=True).save_pretrained('./model')"
 
       - name: Commit and push model files
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Use the default GitHub token or a PAT
         run: |
           git config --global user.name "GitHub Actions"
           git config --global user.email "actions@github.com"
