@@ -4,8 +4,7 @@ import os
 import random
 from huggingface_hub import InferenceClient
 from datetime import datetime
-from config.config import api_token, models, prompts  # Direct import
-
+from config.config import models, prompts, api_token  # Direct import
 
 def generate(prompt_alias, team, model_alias, custom_prompt, height=360, width=640, num_inference_steps=20, guidance_scale=2.0, seed=-1):
     try:
@@ -17,10 +16,6 @@ def generate(prompt_alias, team, model_alias, custom_prompt, height=360, width=6
 
 
 def generate_image(prompt_alias, team, model_alias, custom_prompt, height=360, width=640, num_inference_steps=20, guidance_scale=2.0, seed=-1):
-    # Debugging: Check if the token is available
-    if not api_token:
-        return None, "ERROR: Hugging Face token (HF_CTB_TOKEN) is missing. Please set it as an environment variable."
-
     # Find the selected prompt and model
     try:
         prompt = next(p for p in prompts if p["alias"] == prompt_alias)["text"]
@@ -51,7 +46,7 @@ def generate_image(prompt_alias, team, model_alias, custom_prompt, height=360, w
     except Exception as e:
         return None, f"ERROR: Failed to initialize InferenceClient. Details: {e}"
 
-    # Generate the image
+     #Generate the image
     try:
         image = client.text_to_image(
             prompt,
